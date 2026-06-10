@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function signedIn() { return request.auth != null; }
+    function role() {
+      // Custom claim if set (free via scripts/set-role.js), else users doc mirror
+      return request.auth.token.role != null
+        ? request.auth.token.role
+        : get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function isOwner() { return signedIn() && role() == "owner"; }
+    function isStaff() { return signedIn() && role() in ["owner", "support"]; }
+
+    match /users/{uid}        { allow read: if isStaff(); allow write: if isOwner(); }
+    match /assetLibrary/{id}  { allow read, create, update: if isStaff(); allow delete: if isOwner(); }
+
+    match /projects/{pid} {
+      allow read, update: if isStaff();
+      allow create, delete: if isOwner();
+      match /{sub=**} { allow read: if isStaff(); }
+      match /devices/{id}     { allow write: if isStaff(); }
+      match /racks/{id}       { allow write: if isStaff(); }
+      match /enclosures/{id}  { allow write: if isStaff(); }
+      match /cables/{id}      { allow write: if isStaff(); }
+      match /connections/{id} { allow write: if isStaff(); }
+      match /diagrams/{id}    { allow write: if isStaff(); }
+      match /reservations/{id} {
+        allow create: if isStaff();
+        allow update, delete: if isOwner() || (isStaff() && resource.data.locked == false);
+      }
+    }
+  }
+}

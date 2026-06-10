@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ejaf Technology — ELV Schematic Studio</title>
+<link rel="stylesheet" href="style.css">
+<!-- Free CDN libraries (no license cost) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/svg2pdf.js/2.2.3/svg2pdf.umd.min.js"></script>
+</head>
+<body>
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <img src="ejaf-logo.svg" alt="Ejaf Technology" class="login-logo">
+    <h1>ELV Schematic Studio</h1>
+    <p class="muted">Sign in to continue</p>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPass" type="password" placeholder="Password">
+    <button id="btnLogin" class="btn primary">Sign In</button>
+    <button id="btnDemo" class="btn">Continue in Demo Mode (no account)</button>
+    <p id="loginError" class="error"></p>
+    <p class="powered">Powered by Siwar</p>
+  </div>
+</div>
+
+<!-- ===== APP SHELL ===== -->
+<div id="appShell" class="app-shell" style="display:none">
+  <header class="topbar">
+    <img src="ejaf-logo.svg" alt="Ejaf Technology" class="topbar-logo">
+    <select id="projectSelect" title="Project"></select>
+    <button id="btnNewProject" class="btn small">+ Project</button>
+    <span class="spacer"></span>
+    <span id="userBadge" class="badge"></span>
+    <button id="btnLogout" class="btn small">Sign out</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="library">Asset Library</button>
+    <button class="tab" data-tab="topology">Topology</button>
+    <button class="tab" data-tab="rack">Rack Builder</button>
+    <button class="tab" data-tab="ports">Port Allocation</button>
+    <button class="tab" data-tab="enclosure">Enclosure</button>
+    <button class="tab" data-tab="export">Export</button>
+  </nav>
+
+  <main id="main">
+    <section id="tab-library" class="tabpane active"></section>
+    <section id="tab-topology" class="tabpane"></section>
+    <section id="tab-rack" class="tabpane"></section>
+    <section id="tab-ports" class="tabpane"></section>
+    <section id="tab-enclosure" class="tabpane"></section>
+    <section id="tab-export" class="tabpane"></section>
+  </main>
+
+  <footer class="footer">Ejaf Technology — ELV Schematic Studio · <strong>Powered by Siwar</strong></footer>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

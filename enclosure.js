@@ -3,7 +3,7 @@ import { state, save } from "./store.js";
 import { branding } from "./branding.js";
 
 const NS = "http://www.w3.org/2000/svg";
-let enc, svg, drag = null;
+let enc, svg, drag = null, armedAsset = null;
 const SCALE = 1.1; // px per mm
 
 export function renderEnclosure(root) {
@@ -55,9 +55,25 @@ export function renderEnclosure(root) {
   pal.innerHTML = state.cache.assets.filter(a => a.uHeight === 0 || ["mediaConverter","powerSupply","accessController"].includes(a.category))
     .map(a => `<div class="palette-item" draggable="true" data-asset="${a.id}">
       <span>${a.manufacturer} ${a.model} <b>(${a.dimensionsMm?.w}×${a.dimensionsMm?.h}mm)</b></span></div>`).join("");
-  pal.querySelectorAll(".palette-item").forEach(p => p.ondragstart = e => e.dataTransfer.setData("asset", p.dataset.asset));
+  pal.querySelectorAll(".palette-item").forEach(p => {
+    p.ondragstart = e => e.dataTransfer.setData("asset", p.dataset.asset);
+    // Touch: tap a component to arm it, then tap inside the box to place it
+    p.onclick = () => {
+      pal.querySelectorAll(".palette-item").forEach(x => x.classList.remove("armed"));
+      if (armedAsset === p.dataset.asset) { armedAsset = null; return; }
+      armedAsset = p.dataset.asset; p.classList.add("armed");
+    };
+  });
   svg.ondragover = e => e.preventDefault();
   svg.ondrop = onDrop;
+  svg.onclick = async e => {
+    if (!armedAsset || !enc || drag != null) return;
+    enc.components = enc.components || [];
+    enc.components.push({ assetRef: armedAsset,
+      x: Math.max(0, (e.offsetX - x0) / SCALE), y: Math.max(0, (e.offsetY - y0) / SCALE) });
+    armedAsset = null; pal.querySelectorAll(".palette-item").forEach(x => x.classList.remove("armed"));
+    await save("enclosures", enc); paint();
+  };
   enc = list[0] || null;
   paint();
 }
@@ -83,17 +99,18 @@ function paint() {
     r.setAttribute("width", cw); r.setAttribute("height", ch); r.setAttribute("rx", 4);
     r.setAttribute("fill", "#dbe7f5"); r.setAttribute("stroke", branding.colors.primary);
     r.style.cursor = "move";
-    r.onmousedown = ev => drag = { i, ox: ev.offsetX - (x0 + c.x * SCALE), oy: ev.offsetY - (y0 + c.y * SCALE) };
+    r.style.touchAction = "none";
+    r.onpointerdown = ev => { ev.preventDefault(); svg.setPointerCapture?.(ev.pointerId); drag = { i, ox: ev.offsetX - (x0 + c.x * SCALE), oy: ev.offsetY - (y0 + c.y * SCALE) }; };
     r.ondblclick = async () => { enc.components.splice(i, 1); await save("enclosures", enc); paint(); };
     svg.appendChild(r);
     txt(x0 + c.x * SCALE + 4, y0 + c.y * SCALE + 14, a.model, 9.5, "#1c2733", 600);
   });
-  svg.onmousemove = ev => { if (drag != null) {
+  svg.onpointermove = ev => { if (drag != null) {
     const c = enc.components[drag.i];
     c.x = Math.max(0, (ev.offsetX - drag.ox - x0) / SCALE);
     c.y = Math.max(0, (ev.offsetY - drag.oy - y0) / SCALE);
     paint(); } };
-  svg.onmouseup = async () => { if (drag != null) { await save("enclosures", enc); drag = null; } };
+  svg.onpointerup = async () => { if (drag != null) { await save("enclosures", enc); drag = null; } };
   // feed arrows
   const feeds = enc.feeds || {};
   arrow(x0 - 80, y0 + 40, x0, y0 + 40, "#c62828", "⚡ " + (feeds.powerIn || "Power in"), false);

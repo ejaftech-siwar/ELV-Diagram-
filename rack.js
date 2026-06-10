@@ -5,7 +5,7 @@ import { branding } from "./branding.js";
 const NS = "http://www.w3.org/2000/svg";
 const U = 22;           // px per U on screen
 const RW = 320;         // rack inner width px
-let svg, rack, powerMode = false, powerFrom = null;
+let svg, rack, powerMode = false, powerFrom = null, armedAsset = null;
 
 export function renderRack(root) {
   const racks = state.cache.racks;
@@ -27,7 +27,7 @@ export function renderRack(root) {
       <div id="rackPalette"></div>
       <h3 style="margin-top:14px">Power</h3>
       <button id="btnPowerMode" class="btn" style="width:100%">Power routing mode: OFF</button>
-      <p class="muted" style="font-size:11.5px">In power mode: click the UPS, then click each device it feeds. Double-click a device to remove it from the rack.</p>
+      <p class="muted" style="font-size:11.5px">Tap equipment above to select it, then tap a U row to install it (or drag In power mode: click the UPS, then click each device it feeds. Double-click a device to remove it from the rack.amp; drop on desktop). Power mode: tap the UPS, then tap each device it feeds. Double-tap a device to remove it.</p>
       <div id="upsLoad" class="muted" style="font-size:12.5px;margin-top:8px"></div>
     </div>
     <div class="grow">
@@ -59,8 +59,15 @@ function palette(root) {
       ${a.imageData ? `<img src="${a.imageData}">` : `<img src="ejaf-logo.svg">`}
       <span>${a.manufacturer} ${a.model} <b>(${a.uHeight}U${a.power?.watts ? ", " + a.power.watts + "W" : ""})</b></span>
     </div>`).join("");
-  el.querySelectorAll(".palette-item").forEach(p =>
-    p.ondragstart = e => e.dataTransfer.setData("asset", p.dataset.asset));
+  el.querySelectorAll(".palette-item").forEach(p => {
+    p.ondragstart = e => e.dataTransfer.setData("asset", p.dataset.asset);
+    // Touch: tap equipment to arm it, then tap a U row in the rack to install it
+    p.onclick = () => {
+      el.querySelectorAll(".palette-item").forEach(x => x.classList.remove("armed"));
+      if (armedAsset === p.dataset.asset) { armedAsset = null; return; }
+      armedAsset = p.dataset.asset; p.classList.add("armed");
+    };
+  });
 }
 
 function paint(root) {
@@ -89,6 +96,13 @@ function paint(root) {
     row.dataset.u = u;
     row.ondragover = e => e.preventDefault();
     row.ondrop = e => onDrop(e, u, root);
+    row.onclick = async () => {
+      if (!armedAsset) return;
+      const a = state.cache.assets.find(x => x.id === armedAsset);
+      armedAsset = null;
+      document.querySelectorAll("#rackPalette .palette-item").forEach(x => x.classList.remove("armed"));
+      if (a) await place(a, u, root, row);
+    };
     svg.appendChild(row);
     [x0 - 14, x0 + RW + 4].forEach(lx => {
       const n = document.createElementNS(NS, "text");
@@ -152,9 +166,11 @@ function devY(d, y0) {
 async function onDrop(e, u, root) {
   e.preventDefault();
   const asset = state.cache.assets.find(a => a.id === e.dataTransfer.getData("asset"));
-  if (!asset) return;
+  if (asset) await place(asset, u, root, e.target);
+}
+async function place(asset, u, root, rowEl) {
   for (let k = u; k < u + asset.uHeight; k++) {
-    if (k > rack.uSize || rack.slots[k]) { flash(e.target); return; }
+    if (k > rack.uSize || rack.slots[k]) { flash(rowEl); return; }
   }
   const dev = await save("devices", {
     assetRef: asset.id, label: `${asset.model}-${u}U`, system: asset.system,

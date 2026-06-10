@@ -2,7 +2,7 @@ export const branding = {
   appName: "Ejaf Technology — ELV Schematic Studio",
   poweredBy: "Powered by Siwar",
   company: "Ejaf Technology",
-  colors: { primary: "#0B5394", accent: "#E69138" },
+  colors: { primary: "#0A3DBB", accent: "#FFB020" },
   cableStyles: {
     CAT5E:      { color: "#2e7d32", dash: "" ,     label: "Cat5e" },
     CAT6:       { color: "#1565c0", dash: "" ,     label: "Cat6" },

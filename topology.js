@@ -17,7 +17,7 @@ export function renderTopology(root) {
       <button id="btnAddDev" class="btn primary" style="width:100%">Add to canvas</button>
       <h3 style="margin-top:16px">Connect (cable)</h3>
       <select id="cableType" style="width:100%">${Object.entries(branding.cableStyles).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}</select>
-      <p class="muted" style="font-size:11.5px">Click a port, then click a second port to run a cable. Click a cable to select; press Delete to remove. Drag device bodies to move.</p>
+      <p class="muted" style="font-size:11.5px">Tap a port, then tap a second port to run a cable. Tap a cable to select it (press Delete on desktop to remove). Drag device headers to move them.</p>
       <h3>Filter systems</h3>
       <div id="sysFilters">${branding.systems.map(s=>`<label style="display:block;font-size:12.5px"><input type="checkbox" checked data-sys="${s}"> ${s}</label>`).join("")}</div>
       <button id="btnSaveTopo" class="btn primary" style="width:100%;margin-top:12px">Save layout</button>
@@ -128,12 +128,13 @@ export function paint() {
       pl.textContent = p.name; g.appendChild(pl);
     });
     // drag
-    const startDrag = ev => { drag = { d, ox: ev.offsetX - d.topo.x, oy: ev.offsetY - d.topo.y }; };
-    r.onmousedown = startDrag; hd.onmousedown = startDrag;
+    const startDrag = ev => { ev.preventDefault(); svg.setPointerCapture?.(ev.pointerId); drag = { d, ox: ev.offsetX - d.topo.x, oy: ev.offsetY - d.topo.y }; };
+    r.style.touchAction = "none"; hd.style.touchAction = "none";
+    r.onpointerdown = startDrag; hd.onpointerdown = startDrag;
     svg.appendChild(g);
   }
-  svg.onmousemove = ev => { if (drag) { drag.d.topo.x = ev.offsetX - drag.ox; drag.d.topo.y = ev.offsetY - drag.oy; paint(); } };
-  svg.onmouseup = async () => { if (drag) { await save("devices", drag.d); drag = null; } };
+  svg.onpointermove = ev => { if (drag) { drag.d.topo.x = ev.offsetX - drag.ox; drag.d.topo.y = ev.offsetY - drag.oy; paint(); } };
+  svg.onpointerup = async () => { if (drag) { await save("devices", drag.d); drag = null; } };
   svg.onclick = () => { selectedCable = null; paint(); };
 }
 

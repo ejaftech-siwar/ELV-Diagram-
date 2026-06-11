@@ -1,16 +1,16 @@
-import { initBackend, signIn, demoSignIn, signOutUser, state, refreshCache, seedIfEmpty, save, list } from "./store.js";
+import { initBackend, signIn, demoSignIn, signOutUser, state, refreshCache, seedIfEmpty, list } from "./store.js";
+import { renderEditor } from "./editor.js";
 import { renderLibrary } from "./library.js";
 import { renderTopology } from "./topology.js";
-import { renderDesigner } from "./designer.js";
 import { renderRack } from "./rack.js";
 import { renderPorts } from "./ports.js";
 import { renderEnclosure } from "./enclosure.js";
 import { renderExport } from "./export-tab.js";
 
 const $ = s => document.querySelector(s);
-const renderers = { library: renderLibrary, designer: renderDesigner, topology: renderTopology, rack: renderRack,
-                    ports: renderPorts, enclosure: renderEnclosure, export: renderExport };
-let activeTab = "library";
+const tools = { library: ["Asset Library", renderLibrary], topology: ["Topology", renderTopology],
+  rack: ["Rack Builder", renderRack], ports: ["Port Allocation", renderPorts],
+  enclosure: ["Enclosure", renderEnclosure], export: ["Schedules (Excel)", renderExport] };
 
 async function boot() {
   const mode = await initBackend();
@@ -24,37 +24,29 @@ async function doLogin() {
   try { await signIn($("#loginEmail").value.trim(), $("#loginPass").value); await enter(); }
   catch (e) { $("#loginError").textContent = e.message || "Sign-in failed"; }
 }
-
 async function enter() {
   await seedIfEmpty();
   const projects = await list("projects");
   state.projectId = state.projectId || (projects[0] && projects[0].id);
   await refreshCache();
   $("#loginScreen").style.display = "none";
-  $("#appShell").style.display = "flex";
-  $("#userBadge").textContent = `${state.user.email} · ${state.user.role.toUpperCase()}${state.mode==="demo" ? " · DEMO" : ""}`;
+  $("#editorRoot").style.display = "block";
+  renderEditor($("#editorRoot"));
+  $("#userBadge").textContent =
+    `${state.user.email} · ${state.user.role.toUpperCase()}${state.mode === "demo" ? " · DEMO" : ""}`;
   $("#btnLogout").onclick = async () => { await signOutUser(); location.reload(); };
-  fillProjects();
-  $("#btnNewProject").onclick = async () => {
-    if (state.user.role !== "owner") return alert("Only Owner can create projects.");
-    const name = prompt("Project name:"); if (!name) return;
-    const p = await save("projects", { name, client: "", systems: [], status: "draft" });
-    state.projectId = p.id; await refreshCache(); fillProjects(); show(activeTab);
-  };
-  document.querySelectorAll(".tab").forEach(b => b.onclick = () => show(b.dataset.tab));
-  show("library");
 }
-function fillProjects() {
-  const sel = $("#projectSelect");
-  sel.innerHTML = state.cache.projects.map(p =>
-    `<option value="${p.id}" ${p.id===state.projectId?"selected":""}>${p.name}</option>`).join("");
-  sel.onchange = async () => { state.projectId = sel.value; await refreshCache(); show(activeTab); };
-}
-export async function show(tab) {
-  activeTab = tab;
-  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-  document.querySelectorAll(".tabpane").forEach(p => p.classList.toggle("active", p.id === "tab-" + tab));
+// Tools overlay (legacy modules), opened from the editor's Tools menu
+window.openToolOverlay = async key => {
+  const [title, render] = tools[key];
   await refreshCache();
-  renderers[tab](document.getElementById("tab-" + tab));
-}
+  $("#toolsTitle").textContent = title;
+  $("#toolsOverlay").style.display = "flex";
+  document.querySelectorAll("#toolsMain .tabpane").forEach(p =>
+    p.classList.toggle("active", p.id === "tab-" + key));
+  render(document.getElementById("tab-" + key));
+};
+document.addEventListener("click", e => {
+  if (e.target?.id === "toolsBack") $("#toolsOverlay").style.display = "none";
+});
 boot();

@@ -182,3 +182,81 @@ dialog::backdrop{background:rgba(7,13,28,.6)}
 #dtools{position:sticky;top:0;z-index:5;background:transparent}
 #dtools select{min-height:34px;padding:4px 8px;font-size:12px;max-width:130px}
 @media (max-width:860px){ .st-grid{grid-template-columns:1fr 1fr 1fr} }
+
+/* ================= VISIO-STYLE EDITOR ================= */
+.vz-app{display:flex;flex-direction:column;height:100vh;background:#E9EDF4;font-family:var(--font-body)}
+/* menubar */
+.vz-menubar{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--ink-900),var(--ink-800));
+  padding:6px 12px;border-bottom:1px solid #1E3261;position:relative;z-index:60;flex-wrap:wrap}
+.vz-logo{height:30px;margin-right:6px}
+.vz-title{color:#9CC1FF;font-family:var(--font-disp);font-size:13px;letter-spacing:.4px;
+  margin-left:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+.vz-menu{position:relative}
+.vz-mbtn{background:transparent;border:1px solid transparent;color:#C9DAFF;padding:7px 12px;
+  border-radius:7px;cursor:pointer;font-size:13px;font-weight:600}
+.vz-mbtn:hover{background:var(--ink-700);border-color:#2A4A8F}
+.vz-drop{display:none;position:absolute;left:0;top:110%;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:0 14px 40px rgba(11,20,38,.3);min-width:230px;overflow:hidden;z-index:70}
+.vz-drop.open{display:block}
+.vz-drop button{display:block;width:100%;text-align:left;border:none;background:none;
+  padding:11px 16px;font-size:13.5px;cursor:pointer;font-family:var(--font-body)}
+.vz-drop button:hover{background:#EEF3FB;color:var(--blue-700)}
+.vz-drop hr{border:none;border-top:1px solid var(--line);margin:4px 0}
+/* ribbon */
+.vz-ribbon{display:flex;gap:0;background:#fff;border-bottom:1px solid var(--line);
+  padding:6px 10px;overflow-x:auto;align-items:stretch;scrollbar-width:none}
+.vz-ribbon::-webkit-scrollbar{display:none}
+.vz-group{display:flex;align-items:center;gap:6px;padding:4px 14px;border-right:1px solid var(--line);
+  position:relative;flex:0 0 auto}
+.vz-glabel{position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);font-size:9px;
+  letter-spacing:1px;text-transform:uppercase;color:#9AA8C4;font-family:var(--font-disp);display:none}
+.vz-btn{border:1.5px solid transparent;background:transparent;padding:8px 12px;border-radius:8px;
+  cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-700);white-space:nowrap;min-height:38px}
+.vz-btn:hover{background:#EEF3FB;border-color:var(--line)}
+.vz-btn.primary{background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:#fff}
+.vz-zpct{font-family:var(--font-disp);font-size:12.5px;min-width:44px;text-align:center;color:var(--ink-700)}
+.vz-ribbon select{min-height:36px;padding:4px 8px;font-size:12px;max-width:130px}
+.vz-ribbon input{min-height:36px;padding:4px 10px;font-size:12.5px;width:110px}
+#vzInspect{gap:6px}
+/* body */
+.vz-body{flex:1;display:flex;min-height:0}
+.vz-shapes{width:228px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);
+  overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.vz-shead{font-family:var(--font-disp);font-size:12px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--blue-700);display:flex;align-items:center;justify-content:space-between}
+.vz-import{font-size:11px;color:var(--blue-700);border:1.5px solid var(--line);border-radius:7px;
+  padding:4px 8px;cursor:pointer;font-weight:700}
+.vz-import:hover{border-color:var(--blue-500)}
+.vz-shapes #stSearch{width:100%}
+.vz-canvasbg{flex:1;overflow:hidden;background:
+  radial-gradient(1200px 500px at 60% -20%, #DDE6F5 0%, transparent 60%), #CBD5E6;position:relative}
+.vz-canvas{display:block;width:100%;height:100%}
+/* page bar */
+.vz-pagebar{display:flex;align-items:center;gap:4px;background:#fff;border-top:1px solid var(--line);
+  padding:5px 10px;overflow-x:auto}
+#pageTabs{display:flex;gap:4px}
+.vz-ptab{border:1.5px solid var(--line);background:#F3F6FC;color:var(--muted);border-radius:8px 8px 0 0;
+  padding:7px 16px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-disp);white-space:nowrap}
+.vz-ptab.on{background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:#fff;border-color:transparent}
+.vz-ptab.add{border-radius:8px;padding:7px 12px}
+.vz-status{font-size:11.5px;color:var(--muted);font-family:var(--font-disp);letter-spacing:.6px;white-space:nowrap}
+/* tools overlay (legacy modules) */
+.tools-overlay{position:fixed;inset:0;background:var(--surface);z-index:100;display:flex;flex-direction:column}
+.tools-bar{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--ink-900),var(--ink-800));
+  padding:10px 14px;border-bottom:1px solid #1E3261}
+.tools-bar .btn{background:transparent;border-color:#2A4A8F;color:#C9DAFF}
+.tools-title{color:#fff;font-family:var(--font-disp);font-size:14px;letter-spacing:.6px}
+#toolsMain{flex:1;overflow:auto;padding:14px}
+/* editor mobile */
+@media (max-width:860px){
+  .vz-shapes{position:absolute;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);
+    transition:.2s;box-shadow:0 0 40px rgba(11,20,38,.35);width:240px}
+  .vz-shapes.open{transform:none}
+  .vz-body{position:relative}
+  .vz-title{display:none}
+  .vz-btn{padding:8px 10px}
+}
+.vz-shapestoggle{display:none}
+@media (max-width:860px){
+  .vz-shapestoggle{display:inline-block;position:absolute;left:10px;top:10px;z-index:55}
+}

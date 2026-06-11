@@ -1,13 +1,14 @@
 import { initBackend, signIn, demoSignIn, signOutUser, state, refreshCache, seedIfEmpty, save, list } from "./store.js";
 import { renderLibrary } from "./library.js";
 import { renderTopology } from "./topology.js";
+import { renderDesigner } from "./designer.js";
 import { renderRack } from "./rack.js";
 import { renderPorts } from "./ports.js";
 import { renderEnclosure } from "./enclosure.js";
 import { renderExport } from "./export-tab.js";
 
 const $ = s => document.querySelector(s);
-const renderers = { library: renderLibrary, topology: renderTopology, rack: renderRack,
+const renderers = { library: renderLibrary, designer: renderDesigner, topology: renderTopology, rack: renderRack,
                     ports: renderPorts, enclosure: renderEnclosure, export: renderExport };
 let activeTab = "library";
 

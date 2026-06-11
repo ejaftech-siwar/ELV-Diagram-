@@ -6,7 +6,7 @@ export const state = {
   user: null,              // { uid, email, role }
   projectId: null,
   cache: { assets: [], devices: [], cables: [], connections: [],
-           racks: [], enclosures: [], reservations: [], projects: [], diagrams: [] }
+           racks: [], enclosures: [], reservations: [], projects: [], diagrams: [], stencils: [] }
 };
 
 let fb = null; // firebase handles
@@ -94,7 +94,7 @@ export async function refreshCache() {
   state.cache.projects = await list("projects");
   state.cache.assets   = await list("assets");
   if (!state.projectId) return;
-  for (const n of ["devices","cables","connections","racks","enclosures","reservations","diagrams"])
+  for (const n of ["devices","cables","connections","racks","enclosures","reservations","diagrams","stencils"])
     state.cache[n] = await list(n);
 }
 

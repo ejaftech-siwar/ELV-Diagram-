@@ -161,3 +161,24 @@ dialog::backdrop{background:rgba(7,13,28,.6)}
   .canvas-wrap{max-height:62vh}
 }
 @media (max-width:400px){ .form-grid{grid-template-columns:1fr} }
+
+/* ---------- Designer: stencil library, inspector, export menu ---------- */
+.st-cat{font-family:var(--font-disp);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--blue-700);margin:12px 0 6px;padding-bottom:4px;border-bottom:1.5px solid var(--line)}
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.st-item{display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px solid var(--line);
+  border-radius:10px;padding:7px 4px;cursor:pointer;background:#fff;transition:.12s;text-align:center}
+.st-item span{font-size:10px;color:var(--muted);line-height:1.15}
+.st-item:hover{border-color:var(--blue-500);box-shadow:0 3px 10px rgba(45,125,255,.18)}
+.st-item.armed{border-color:var(--amber);background:#FFF7E6;box-shadow:0 0 0 3px rgba(255,176,32,.25)}
+.st-item.armed span{color:#9A6200;font-weight:700}
+.exp-menu{position:relative}
+.exp-list{display:none;position:absolute;right:0;top:110%;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:var(--shadow);z-index:40;min-width:190px;overflow:hidden}
+.exp-list.open{display:block}
+.exp-list button{display:block;width:100%;text-align:left;border:none;background:none;
+  padding:11px 14px;font-size:13px;cursor:pointer;font-family:var(--font-body)}
+.exp-list button:hover{background:#EEF3FB;color:var(--blue-700)}
+#dtools{position:sticky;top:0;z-index:5;background:transparent}
+#dtools select{min-height:34px;padding:4px 8px;font-size:12px;max-width:130px}
+@media (max-width:860px){ .st-grid{grid-template-columns:1fr 1fr 1fr} }
